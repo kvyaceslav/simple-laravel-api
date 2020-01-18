@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
 {
@@ -21,7 +23,7 @@ class CategoryController extends Controller
         return new JsonResponse([
             'success' => true,
             'categories' => $categories,
-        ], 200);
+        ]);
     }
 
     /**
@@ -31,7 +33,7 @@ class CategoryController extends Controller
     public function show(Category $category): JsonResponse
     {
         if ($category->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this category'], 400);
+            return new JsonResponse(['error' => trans('api.category_permission')], Response::HTTP_BAD_REQUEST);
         }
 
         return new JsonResponse([
@@ -52,7 +54,7 @@ class CategoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], 400);
+            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
         $category = new Category();
@@ -72,7 +74,7 @@ class CategoryController extends Controller
         return new JsonResponse([
             'success' => true,
             'category' => $category,
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -83,7 +85,9 @@ class CategoryController extends Controller
     public function update(Category $category, Request $request): JsonResponse
     {
         if ($category->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this category'], 400);
+            return new JsonResponse([
+                'error' => trans('api.category_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $validator = Validator::make($request->all(), [
@@ -92,14 +96,16 @@ class CategoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], 400);
+            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
         if ($request->get('name')) {
             $existCategories = Category::GetByNameForUser($request->get('name'))->get();
 
             if (!$existCategories->isEmpty()) {
-                return new JsonResponse(['error' => 'Category with same name already exist'], 400);
+                return new JsonResponse([
+                    'error' => trans('api.category_exist'),
+                ], Response::HTTP_BAD_REQUEST);
             }
 
             $category->name = $request->get('name');
@@ -117,23 +123,25 @@ class CategoryController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'category' => $category
-        ], 200);
+            'category' => $category,
+        ]);
     }
 
     /**
      * @param Category $category
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Category $category): JsonResponse
     {
         if ($category->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this category'], 400);
+            return new JsonResponse([
+                'error' => trans('api.category_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $category->delete();
 
-        return new JsonResponse(['success' => true], 200);
+        return new JsonResponse(['success' => true]);
     }
 }

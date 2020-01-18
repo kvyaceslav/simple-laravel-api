@@ -5,10 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Category;
 use App\Http\Controllers\Controller;
 use App\Product;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
@@ -22,7 +24,7 @@ class ProductController extends Controller
         return new JsonResponse([
             'success' => true,
             'products' => $products,
-        ], 200);
+        ]);
     }
 
     /**
@@ -32,7 +34,9 @@ class ProductController extends Controller
     public function show(Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this product'], 400);
+            return new JsonResponse([
+                'error' => trans('api.product_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         return new JsonResponse([
@@ -53,7 +57,7 @@ class ProductController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], 400);
+            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
         $product = new Product();
@@ -64,8 +68,8 @@ class ProductController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'product' => $product
-        ], 201);
+            'product' => $product,
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -76,7 +80,9 @@ class ProductController extends Controller
     public function update(Product $product, Request $request): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this product'], 400);
+            return new JsonResponse([
+                'error' => trans('api.product_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $validator = Validator::make($request->all(), [
@@ -85,14 +91,16 @@ class ProductController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], 400);
+            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
         if ($request->get('name')) {
             $existProducts = Product::GetByNameForUser($request->get('name'))->get();
 
             if (!$existProducts->isEmpty()) {
-                return new JsonResponse(['error' => 'Product with same name already exist'], 400);
+                return new JsonResponse([
+                    'error' => trans('api.product_exist'),
+                ], Response::HTTP_BAD_REQUEST);
             }
 
             $product->name = $request->get('name');
@@ -112,24 +120,26 @@ class ProductController extends Controller
 
         return new JsonResponse([
             'success' => true,
-            'product' => $product
-        ], 200);
+            'product' => $product,
+        ]);
     }
 
     /**
      * @param Product $product
      * @return JsonResponse
-     * @throws \Exception
+     * @throws Exception
      */
     public function delete(Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this product'], 400);
+            return new JsonResponse([
+                'error' => trans('api.product_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $product->delete();
 
-        return new JsonResponse(['success' => true], 200);
+        return new JsonResponse(['success' => true]);
     }
 
     /**
@@ -140,11 +150,15 @@ class ProductController extends Controller
     public function removeCategory(Product $product, Category $category): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this product'], 400);
+            return new JsonResponse([
+                'error' => trans('api.product_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         if ($category->user_id !== Auth::id()) {
-            return new JsonResponse(['error' => 'You don`t have permission for this category'], 400);
+            return new JsonResponse([
+                'error' => trans('api.category_permission'),
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $product->categories()->detach($category);
@@ -152,6 +166,6 @@ class ProductController extends Controller
         return new JsonResponse([
             'success' => true,
             'product' => $product,
-        ], 200);
+        ]);
     }
 }

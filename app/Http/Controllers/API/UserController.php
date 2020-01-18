@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\User;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -26,10 +27,10 @@ class UserController extends Controller
 
             $response = ['token' => $user->createToken('MyApp')->accessToken];
 
-            return new JsonResponse(['success' => $response], 200);
+            return new JsonResponse(['success' => $response]);
         }
 
-        return new JsonResponse(['error' => 'Unauthorised'], 400);
+        return new JsonResponse(['error' => trans('api.unauthorised')], Response::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -45,7 +46,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], 400);
+            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
         }
 
         $user = User::create([
@@ -57,7 +58,7 @@ class UserController extends Controller
         $response['token'] = $user->createToken('MyApp')->accessToken;
         $response['name'] = $user->name;
 
-        return new JsonResponse(['success' => $response], 201);
+        return new JsonResponse(['success' => $response], Response::HTTP_CREATED);
     }
 
     /**
@@ -67,6 +68,6 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        return response()->json(['success' => $user], 200);
+        return response()->json(['success' => $user]);
     }
 }
