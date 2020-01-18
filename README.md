@@ -7,8 +7,9 @@ Simple Laravel 6 API with categories/products.
 $ git clone ...
 $ cd simple-laravel-api
 $ cp .env.example .env (Create database and change settings)
-$ php artisan key:generate
 $ composer install
 $ npm install
+$ php artisan key:generate
 $ php artisan migrate
+$ php artisan passport:install
 ```
