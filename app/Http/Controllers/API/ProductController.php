@@ -15,11 +15,13 @@ use Symfony\Component\HttpFoundation\Response;
 class ProductController extends Controller
 {
     /**
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = Product::GetListForUser()->get();
+        $products = Product::GetListForUser()
+            ->paginate($request->get('paginate') ?: '');
 
         return new JsonResponse([
             'success' => true,

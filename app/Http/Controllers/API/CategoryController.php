@@ -14,11 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 class CategoryController extends Controller
 {
     /**
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $categories = Category::GetListForUser()->get();
+        $categories = Category::GetListForUser()
+            ->paginate($request->get('paginate') ?: '');
 
         return new JsonResponse([
             'success' => true,
