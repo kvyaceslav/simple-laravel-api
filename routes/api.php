@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\ProductController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -8,28 +12,22 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
 |
 */
 
-Route::post('login', 'API\UserController@login');
-Route::post('register', 'API\UserController@register');
-Route::group(['middleware' => 'auth:api'], function () {
-    Route::get('details', 'API\UserController@details');
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
-    // Categories
-    Route::get('category', 'API\CategoryController@index');
-    Route::get('category/{category}', 'API\CategoryController@show');
-    Route::post('category', 'API\CategoryController@create');
-    Route::patch('category/{category}', 'API\CategoryController@update');
-    Route::delete('category/{category}', 'API\CategoryController@delete');
+Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
 
-    // Products
-    Route::get('product', 'API\ProductController@index');
-    Route::get('product/{product}', 'API\ProductController@show');
-    Route::post('product', 'API\ProductController@create');
-    Route::patch('product/{product}', 'API\ProductController@update');
-    Route::delete('product/{product}', 'API\ProductController@delete');
-    Route::patch('product/{product}/category/{category}', 'API\ProductController@removeCategory');
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('user', [AuthController::class, 'details']);
+    Route::get('logout', [AuthController::class, 'logout']);
+
+    Route::apiResource('product', ProductController::class);
+    Route::apiResource('category', CategoryController::class);
 });

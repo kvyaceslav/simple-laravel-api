@@ -2,31 +2,52 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Category;
-use App\Http\Controllers\Controller;
-use App\Product;
-use Exception;
+use App\Constants\AuthConstants;
+use App\Constants\ProductConstants;
+use App\Http\Requests\ProductRequest;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
-class ProductController extends Controller
+class ProductController extends BaseController
 {
     /**
-     * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $products = Product::GetListForUser()
-            ->paginate($request->get('paginate') ?: '');
+        return $this->sendResponse(
+            Product::ForUser()
+                ->with('categories')
+                ->get()
+                ->toArray(),
+            ''
+        );
+    }
 
-        return new JsonResponse([
-            'success' => true,
-            'products' => $products,
-        ]);
+    /**
+     * @param ProductRequest $request
+     * @return JsonResponse
+     */
+    public function store(ProductRequest $request): JsonResponse
+    {
+        $product = Product::create($request->all());
+
+        if (isset($request->categories)) {
+            $categories = Category::ForUserByIds($request->categories);
+
+            if (!$categories->isEmpty()) {
+                $product->categories()->attach($categories);
+            }
+        }
+
+        return $this->sendResponse(
+            $product
+                ->load('categories')
+                ->toArray(),
+            ProductConstants::STORE
+        );
     }
 
     /**
@@ -36,138 +57,56 @@ class ProductController extends Controller
     public function show(Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse([
-                'error' => trans('api.product_permission'),
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->sendError(AuthConstants::UNAUTHORIZED);
         }
 
-        return new JsonResponse([
-            'success' => true,
-            'product' => $product->load(['categories']),
-        ]);
+        return $this->sendResponse($product->load('categories')->toArray(), '');
     }
 
     /**
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function create(Request $request): JsonResponse
-    {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|min:4',
-            'price' => 'required|numeric',
-        ]);
-
-        if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
-        }
-
-        $product = new Product();
-        $product->name = $request->get('name');
-        $product->price = $request->get('price');
-        $product->user_id = Auth::id();
-        $product->save();
-
-        return new JsonResponse([
-            'success' => true,
-            'product' => $product,
-        ], Response::HTTP_CREATED);
-    }
-
-    /**
+     * @param ProductRequest $request
      * @param Product $product
-     * @param Request $request
      * @return JsonResponse
      */
-    public function update(Product $product, Request $request): JsonResponse
+    public function update(ProductRequest $request, Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse([
-                'error' => trans('api.product_permission'),
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->sendError(AuthConstants::UNAUTHORIZED);
         }
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'min:4',
-            'price' => 'numeric',
-        ]);
+        if (isset($request->categories)) {
+            $categories = Category::ForUserByIds($request->categories);
 
-        if ($validator->fails()) {
-            return new JsonResponse(['error' => $validator->errors()], Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($request->get('name')) {
-            $existProducts = Product::GetByNameForUser($request->get('name'))->get();
-
-            if (!$existProducts->isEmpty()) {
-                return new JsonResponse([
-                    'error' => trans('api.product_exist'),
-                ], Response::HTTP_BAD_REQUEST);
+            if (!$categories->isEmpty()) {
+                $product->categories()->detach();
+                $product->categories()->attach($categories);
+            } else {
+                $product->categories()->detach();
             }
-
-            $product->name = $request->get('name');
         }
 
-        if ($request->get('price')) {
-            $product->price = $request->get('price');
-        }
+        $product->update($request->all());
 
-        if ($request->get('categories')) {
-            $categories = Category::find($request->get('categories'));
-
-            $product->categories()->attach($categories);
-        }
-
-        $product->save();
-
-        return new JsonResponse([
-            'success' => true,
-            'product' => $product,
-        ]);
+        return $this->sendResponse(
+            $product
+                ->load('categories')
+                ->toArray(),
+            ProductConstants::UPDATE
+        );
     }
 
     /**
      * @param Product $product
      * @return JsonResponse
-     * @throws Exception
      */
-    public function delete(Product $product): JsonResponse
+    public function destroy(Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return new JsonResponse([
-                'error' => trans('api.product_permission'),
-            ], Response::HTTP_BAD_REQUEST);
+            return $this->sendError(AuthConstants::UNAUTHORIZED);
         }
 
         $product->delete();
 
-        return new JsonResponse(['success' => true]);
-    }
-
-    /**
-     * @param Product $product
-     * @param Category $category
-     * @return JsonResponse
-     */
-    public function removeCategory(Product $product, Category $category): JsonResponse
-    {
-        if ($product->user_id !== Auth::id()) {
-            return new JsonResponse([
-                'error' => trans('api.product_permission'),
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        if ($category->user_id !== Auth::id()) {
-            return new JsonResponse([
-                'error' => trans('api.category_permission'),
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        $product->categories()->detach($category);
-
-        return new JsonResponse([
-            'success' => true,
-            'product' => $product,
-        ]);
+        return $this->sendResponse([], ProductConstants::DESTROY);
     }
 }

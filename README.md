@@ -1,15 +1,10 @@
-## Simple Laravel 6 API
+## Simple Laravel 10 REST API
 
-Simple Laravel 6 API with categories/products.
+Simple Laravel 10 REST API with Sanctum Registration/Authentication, Products + Categories.
 
-### Installation:
-```
-$ git clone ...
-$ cd simple-laravel-api
-$ cp .env.example .env (Create database and change settings)
-$ composer install
-$ npm install
-$ php artisan key:generate
-$ php artisan migrate
-$ php artisan passport:install
-```
+Install:
+- Run Docker
+- ./vendor/bin/sail up
+- php artisan migrate
+
+Best regards.
