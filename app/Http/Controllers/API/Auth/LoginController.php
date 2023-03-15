@@ -31,10 +31,15 @@ class LoginController extends BaseController
      */
     public function logout(): JsonResponse
     {
-        $user = Auth::user();
-        $user->currentAccessToken()->delete();
+        if (Auth::check()) {
+            $user = Auth::user();
 
-        return $this->sendResponse([], AuthConstants::LOGOUT);
+            $user->tokens()->delete();
+
+            return $this->sendResponse([], AuthConstants::LOGOUT);
+        }
+
+        return $this->sendError(AuthConstants::UNAUTHORIZED);
     }
 
     /**
