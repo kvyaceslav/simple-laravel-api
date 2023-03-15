@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Constants\AuthConstants;
+use App\Http\Controllers\API\BaseController;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 
-class RegisterController extends Controller
+class RegisterController extends BaseController
 {
     /**
      * @param RegisterRequest $request

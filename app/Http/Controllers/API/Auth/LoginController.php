@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\API\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Constants\AuthConstants;
+use App\Http\Controllers\API\BaseController;
 
-class LoginController extends Controller
+class LoginController extends BaseController
 {
     /**
      * @param AuthRequest $request
