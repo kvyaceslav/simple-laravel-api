@@ -18,6 +18,9 @@ class LoginController extends BaseController
     {
         if (Auth::attempt($request->all())) {
             $user = Auth::user();
+
+            $user->tokens()->delete();
+
             $success = $user->createToken('MyApp')->plainTextToken;
 
             return $this->sendResponse(['token' => $success], AuthConstants::LOGIN);
@@ -31,15 +34,11 @@ class LoginController extends BaseController
      */
     public function logout(): JsonResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
+        $user = Auth::user();
 
-            $user->tokens()->delete();
+        $user->tokens()->delete();
 
-            return $this->sendResponse([], AuthConstants::LOGOUT);
-        }
-
-        return $this->sendError(AuthConstants::UNAUTHORIZED);
+        return $this->sendResponse([], AuthConstants::LOGOUT);
     }
 
     /**
@@ -47,12 +46,8 @@ class LoginController extends BaseController
      */
     public function details(): JsonResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
+        $user = Auth::user();
 
-            return $this->sendResponse($user->toArray(), '');
-        }
-
-        return $this->sendError(AuthConstants::UNAUTHORIZED);
+        return $this->sendResponse($user->toArray(), '');
     }
 }
