@@ -25,9 +25,11 @@ class Product extends Model
      */
     protected static function booted(): void
     {
-        static::creating(function ($product) {
-            $product->user_id = Auth::id();
-        });
+        if (Auth::check()) {
+            static::creating(function ($product) {
+                $product->user_id = Auth::id();
+            });
+        }
     }
 
     /**
