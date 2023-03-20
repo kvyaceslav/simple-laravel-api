@@ -34,6 +34,6 @@ trait HttpResponses
             'status' => '',
             'message' => $message,
             'data' => $data,
-        ]);
+        ], $code);
     }
 }
