@@ -2,15 +2,18 @@
 
 namespace App\Http\Middleware;
 
-use App\Http\Controllers\API\BaseController;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Constants\AuthConstants;
+use App\Http\Controllers\Controller;
+use App\Http\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
 
-class ApiAuthenticate extends BaseController
+class ApiAuthenticate extends Controller
 {
+    use HttpResponses;
+
     /**
      * @param Request $request
      * @param Closure $next
@@ -23,6 +26,6 @@ class ApiAuthenticate extends BaseController
             return $next($request);
         }
 
-        return $this->sendError(AuthConstants::UNAUTHORIZED);
+        return $this->error(AuthConstants::UNAUTHORIZED);
     }
 }

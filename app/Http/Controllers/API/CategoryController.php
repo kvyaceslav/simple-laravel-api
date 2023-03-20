@@ -7,22 +7,21 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Constants\AuthConstants;
 use App\Constants\CategoryConstants;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Resources\CategoryResource;
+use App\Http\Traits\HttpResponses;
 
-class CategoryController extends BaseController
+class CategoryController extends Controller
 {
+    use HttpResponses;
+
     /**
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(
-            Category::ForUser()
-                ->with('products')
-                ->get()
-                ->toArray(),
-            ''
-        );
+        return $this->success(CategoryResource::collection(Category::ForUser()->get()));
     }
 
     /**
@@ -31,9 +30,10 @@ class CategoryController extends BaseController
      */
     public function store(CategoryRequest $request): JsonResponse
     {
-        $category = Category::create($request->all());
-
-        return $this->sendResponse($category->toArray(), CategoryConstants::STORE);
+        return $this->success(
+            new CategoryResource(Category::create($request->all())),
+            CategoryConstants::STORE
+        );
     }
 
     /**
@@ -43,10 +43,10 @@ class CategoryController extends BaseController
     public function show(Category $category): JsonResponse
     {
         if ($category->user_id !== Auth::id()) {
-            return $this->sendError(AuthConstants::UNAUTHORIZED);
+            return $this->error(AuthConstants::UNAUTHORIZED);
         }
 
-        return $this->sendResponse($category->toArray(), '');
+        return $this->success(new CategoryResource($category));
     }
 
     /**
@@ -57,12 +57,12 @@ class CategoryController extends BaseController
     public function update(CategoryRequest $request, Category $category): JsonResponse
     {
         if ($category->user_id !== Auth::id()) {
-            return $this->sendError(AuthConstants::UNAUTHORIZED);
+            return $this->error(AuthConstants::UNAUTHORIZED);
         }
 
         $category->update($request->all());
 
-        return $this->sendResponse($category->toArray(), CategoryConstants::UPDATE);
+        return $this->success(new CategoryResource($category), CategoryConstants::UPDATE);
     }
 
     /**
@@ -72,11 +72,11 @@ class CategoryController extends BaseController
     public function destroy(Category $category): JsonResponse
     {
         if ($category->user_id !== Auth::id()) {
-            return $this->sendError(AuthConstants::UNAUTHORIZED);
+            return $this->error(AuthConstants::UNAUTHORIZED);
         }
 
         $category->delete();
 
-        return $this->sendResponse([], CategoryConstants::DESTROY);
+        return $this->success([], CategoryConstants::DESTROY);
     }
 }

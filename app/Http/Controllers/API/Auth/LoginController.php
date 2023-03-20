@@ -6,10 +6,13 @@ use App\Http\Requests\AuthRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Constants\AuthConstants;
-use App\Http\Controllers\API\BaseController;
+use App\Http\Controllers\Controller;
+use App\Http\Traits\HttpResponses;
 
-class LoginController extends BaseController
+class LoginController extends Controller
 {
+    use HttpResponses;
+
     /**
      * @param AuthRequest $request
      * @return JsonResponse
@@ -23,10 +26,10 @@ class LoginController extends BaseController
 
             $success = $user->createToken('MyApp')->plainTextToken;
 
-            return $this->sendResponse(['token' => $success], AuthConstants::LOGIN);
+            return $this->success(['token' => $success], AuthConstants::LOGIN);
         }
 
-        return $this->sendError(AuthConstants::VALIDATION);
+        return $this->error(AuthConstants::VALIDATION);
     }
 
     /**
@@ -38,7 +41,7 @@ class LoginController extends BaseController
 
         $user->tokens()->delete();
 
-        return $this->sendResponse([], AuthConstants::LOGOUT);
+        return $this->success([], AuthConstants::LOGOUT);
     }
 
     /**
@@ -48,6 +51,6 @@ class LoginController extends BaseController
     {
         $user = Auth::user();
 
-        return $this->sendResponse($user->toArray(), '');
+        return $this->success($user, '');
     }
 }

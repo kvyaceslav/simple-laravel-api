@@ -4,26 +4,25 @@ namespace App\Http\Controllers\API;
 
 use App\Constants\AuthConstants;
 use App\Constants\ProductConstants;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Http\Traits\HttpResponses;
+use App\Http\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
-class ProductController extends BaseController
+class ProductController extends Controller
 {
+    use HttpResponses;
+
     /**
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return $this->sendResponse(
-            Product::ForUser()
-                ->with('categories')
-                ->get()
-                ->toArray(),
-            ''
-        );
+        return $this->success(ProductResource::collection(Product::ForUser()->get()));
     }
 
     /**
@@ -42,12 +41,7 @@ class ProductController extends BaseController
             }
         }
 
-        return $this->sendResponse(
-            $product
-                ->load('categories')
-                ->toArray(),
-            ProductConstants::STORE
-        );
+        return $this->success(new ProductResource($product), ProductConstants::STORE);
     }
 
     /**
@@ -57,10 +51,10 @@ class ProductController extends BaseController
     public function show(Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return $this->sendError(AuthConstants::UNAUTHORIZED);
+            return $this->error(AuthConstants::UNAUTHORIZED);
         }
 
-        return $this->sendResponse($product->load('categories')->toArray(), '');
+        return $this->success(new ProductResource($product));
     }
 
     /**
@@ -71,7 +65,7 @@ class ProductController extends BaseController
     public function update(ProductRequest $request, Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return $this->sendError(AuthConstants::UNAUTHORIZED);
+            return $this->error(AuthConstants::UNAUTHORIZED);
         }
 
         if (isset($request->categories)) {
@@ -87,12 +81,7 @@ class ProductController extends BaseController
 
         $product->update($request->all());
 
-        return $this->sendResponse(
-            $product
-                ->load('categories')
-                ->toArray(),
-            ProductConstants::UPDATE
-        );
+        return $this->success(new ProductResource($product), ProductConstants::UPDATE);
     }
 
     /**
@@ -102,11 +91,11 @@ class ProductController extends BaseController
     public function destroy(Product $product): JsonResponse
     {
         if ($product->user_id !== Auth::id()) {
-            return $this->sendError(AuthConstants::UNAUTHORIZED);
+            return $this->error(AuthConstants::UNAUTHORIZED);
         }
 
         $product->delete();
 
-        return $this->sendResponse([], ProductConstants::DESTROY);
+        return $this->success([], ProductConstants::DESTROY);
     }
 }

@@ -3,25 +3,14 @@
 namespace App\Http\Requests;
 
 use App\Constants\ValidationConstants;
-use App\Http\Controllers\API\BaseController;
+use App\Http\Traits\HttpResponses;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CategoryRequest extends FormRequest
 {
-    /**
-     * @var BaseController
-     */
-    private BaseController $baseController;
-
-    /**
-     * @param BaseController $baseController
-     */
-    public function __construct(BaseController $baseController)
-    {
-        $this->baseController = $baseController;
-    }
+    use HttpResponses;
 
     /**
      * @return array
@@ -40,9 +29,9 @@ class CategoryRequest extends FormRequest
     public function failedValidation(Validator $validator): HttpResponseException
     {
         throw new HttpResponseException(
-            $this->baseController->sendError(
-                ValidationConstants::ERROR,
-                $validator->errors()->messages()
+            $this->error(
+                $validator->errors()->messages(),
+                ValidationConstants::ERROR
             )
         );
     }
