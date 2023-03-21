@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use App\Http\Traits\HttpResponses;
 use App\Http\Resources\ProductResource;
+use App\Http\Traits\Access;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     use HttpResponses;
+    use Access;
 
     /**
      * @return JsonResponse
@@ -50,11 +52,11 @@ class ProductController extends Controller
      */
     public function show(Product $product): JsonResponse
     {
-        if ($product->user_id !== Auth::id()) {
-            return $this->error(AuthConstants::UNAUTHORIZED);
+        if (!$this->canAccess($product)) {
+            return $this->error([], AuthConstants::PERMISSION);
+        } else {
+            return $this->success(new ProductResource($product));
         }
-
-        return $this->success(new ProductResource($product));
     }
 
     /**
@@ -64,24 +66,24 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, Product $product): JsonResponse
     {
-        if ($product->user_id !== Auth::id()) {
-            return $this->error(AuthConstants::UNAUTHORIZED);
-        }
+        if (!$this->canAccess($product)) {
+            return $this->error(AuthConstants::PERMISSION);
+        } else {
+            if (isset($request->categories)) {
+                $categories = Category::ForUserByIds($request->categories);
 
-        if (isset($request->categories)) {
-            $categories = Category::ForUserByIds($request->categories);
-
-            if (!$categories->isEmpty()) {
-                $product->categories()->detach();
-                $product->categories()->attach($categories);
-            } else {
-                $product->categories()->detach();
+                if (!$categories->isEmpty()) {
+                    $product->categories()->detach();
+                    $product->categories()->attach($categories);
+                } else {
+                    $product->categories()->detach();
+                }
             }
+
+            $product->update($request->all());
+
+            return $this->success(new ProductResource($product), ProductConstants::UPDATE);
         }
-
-        $product->update($request->all());
-
-        return $this->success(new ProductResource($product), ProductConstants::UPDATE);
     }
 
     /**
@@ -90,12 +92,12 @@ class ProductController extends Controller
      */
     public function destroy(Product $product): JsonResponse
     {
-        if ($product->user_id !== Auth::id()) {
-            return $this->error(AuthConstants::UNAUTHORIZED);
+        if (!$this->canAccess($product)) {
+            return $this->error(AuthConstants::PERMISSION);
+        } else {
+            $product->delete();
+
+            return $this->success([], ProductConstants::DESTROY);
         }
-
-        $product->delete();
-
-        return $this->success([], ProductConstants::DESTROY);
     }
 }

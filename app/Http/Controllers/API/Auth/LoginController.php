@@ -29,7 +29,7 @@ class LoginController extends Controller
             return $this->success(['token' => $success], AuthConstants::LOGIN);
         }
 
-        return $this->error(AuthConstants::VALIDATION);
+        return $this->error([], AuthConstants::VALIDATION);
     }
 
     /**

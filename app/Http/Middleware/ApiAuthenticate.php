@@ -26,6 +26,6 @@ class ApiAuthenticate extends Controller
             return $next($request);
         }
 
-        return $this->error(AuthConstants::UNAUTHORIZED);
+        return $this->error([], AuthConstants::UNAUTHORIZED);
     }
 }

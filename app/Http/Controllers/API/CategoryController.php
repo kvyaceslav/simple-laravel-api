@@ -4,24 +4,27 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use App\Constants\AuthConstants;
 use App\Constants\CategoryConstants;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
+use App\Http\Traits\Access;
 use App\Http\Traits\HttpResponses;
 
 class CategoryController extends Controller
 {
     use HttpResponses;
+    use Access;
 
     /**
      * @return JsonResponse
      */
     public function index(): JsonResponse
     {
-        return $this->success(CategoryResource::collection(Category::ForUser()->get()));
+        return $this->success(
+            CategoryResource::collection(Category::ForUser()->get())
+        );
     }
 
     /**
@@ -42,11 +45,11 @@ class CategoryController extends Controller
      */
     public function show(Category $category): JsonResponse
     {
-        if ($category->user_id !== Auth::id()) {
-            return $this->error(AuthConstants::UNAUTHORIZED);
+        if (!$this->canAccess($category)) {
+            return $this->error([], AuthConstants::PERMISSION);
+        } else {
+            return $this->success(new CategoryResource($category));
         }
-
-        return $this->success(new CategoryResource($category));
     }
 
     /**
@@ -56,13 +59,16 @@ class CategoryController extends Controller
      */
     public function update(CategoryRequest $request, Category $category): JsonResponse
     {
-        if ($category->user_id !== Auth::id()) {
-            return $this->error(AuthConstants::UNAUTHORIZED);
+        if (!$this->canAccess($category)) {
+            return $this->error([], AuthConstants::PERMISSION);
+        } else {
+            $category->update($request->all());
+
+            return $this->success(
+                new CategoryResource($category),
+                CategoryConstants::UPDATE
+            );
         }
-
-        $category->update($request->all());
-
-        return $this->success(new CategoryResource($category), CategoryConstants::UPDATE);
     }
 
     /**
@@ -71,12 +77,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category): JsonResponse
     {
-        if ($category->user_id !== Auth::id()) {
-            return $this->error(AuthConstants::UNAUTHORIZED);
+        if (!$this->canAccess($category)) {
+            return $this->error([], AuthConstants::PERMISSION);
+        } else {
+            $category->delete();
+
+            return $this->success([], CategoryConstants::DESTROY);
         }
-
-        $category->delete();
-
-        return $this->success([], CategoryConstants::DESTROY);
     }
 }
