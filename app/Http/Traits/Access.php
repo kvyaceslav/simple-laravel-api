@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 trait Access
 {
-    use HttpResponses;
-
     /**
      * @param Model $model
      * @return boolean
