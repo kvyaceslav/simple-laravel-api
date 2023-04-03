@@ -12,7 +12,6 @@ use App\Http\Traits\Access;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {

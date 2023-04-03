@@ -17,7 +17,7 @@ class RegisterController extends Controller
      * @param RegisterRequest $request
      * @return JsonResponse
      */
-    public function index(RegisterRequest $request): JsonResponse
+    public function __invoke(RegisterRequest $request): JsonResponse
     {
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
