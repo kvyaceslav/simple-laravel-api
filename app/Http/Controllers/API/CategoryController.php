@@ -14,8 +14,7 @@ use App\Http\Traits\HttpResponses;
 
 class CategoryController extends Controller
 {
-    use HttpResponses;
-    use Access;
+    use HttpResponses, Access;
 
     /**
      * @return JsonResponse
@@ -34,7 +33,7 @@ class CategoryController extends Controller
     public function store(CategoryRequest $request): JsonResponse
     {
         return $this->success(
-            new CategoryResource(Category::create($request->all())),
+            new CategoryResource(auth()->user()->categories()->create($request->all())),
             CategoryConstants::STORE
         );
     }

@@ -2,6 +2,12 @@
 
 namespace App\Providers;
 
+use App\Events\UserRegistered;
+use App\Listeners\UserRegisteredEmailNotification;
+use App\Models\Category;
+use App\Models\Product;
+use App\Observers\CategoryObserver;
+use App\Observers\ProductObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +24,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        UserRegistered::class => [
+            UserRegisteredEmailNotification::class,
+        ],
     ];
 
     /**
@@ -25,7 +34,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Category::observe(new CategoryObserver());
+        Product::observe(new ProductObserver());
     }
 
     /**

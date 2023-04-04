@@ -22,18 +22,6 @@ class Category extends Model
     ];
 
     /**
-     * @return void
-     */
-    protected static function booted(): void
-    {
-        if (Auth::check()) {
-            static::creating(function ($product) {
-                $product->user_id = Auth::id();
-            });
-        }
-    }
-
-    /**
      * @return BelongsToMany
      */
     public function products(): BelongsToMany

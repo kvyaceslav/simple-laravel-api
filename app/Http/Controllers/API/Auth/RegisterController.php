@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Auth;
 
 use App\Http\Requests\RegisterRequest;
 use App\Constants\AuthConstants;
+use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HttpResponses;
 use App\Models\User;
@@ -24,6 +25,8 @@ class RegisterController extends Controller
         $user = User::create($input);
         $success['token'] = $user->createToken('MyApp')->plainTextToken;
         $success['name'] = $user->name;
+
+        event(new UserRegistered($user));
 
         return $this->success($success, AuthConstants::REGISTER);
     }

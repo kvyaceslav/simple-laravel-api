@@ -15,8 +15,7 @@ use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    use HttpResponses;
-    use Access;
+    use HttpResponses, Access;
 
     /**
      * @return JsonResponse
@@ -32,7 +31,7 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request): JsonResponse
     {
-        $product = Product::create($request->all());
+        $product = auth()->user()->products()->create($request->all());
 
         if (isset($request->categories)) {
             $categories = Category::ForUserByIds($request->categories);
