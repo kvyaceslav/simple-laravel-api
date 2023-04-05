@@ -18,7 +18,7 @@ class UserRegistered
     /**
      * @var User
      */
-    protected User $user;
+    public User $user;
 
     /**
      * @param User $user
