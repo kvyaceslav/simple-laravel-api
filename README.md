@@ -12,6 +12,8 @@ From Docker container:
 - php artisan migrate
 - php artisan queue:work (For queues)
 
+PS. For queues don`t forget to select driver (Redis, ...).
+
 API Structure:
 CRUD[GET, POST, PUT/PATCH, DELETE] for Categories and Products
 [POST] Login / Register 
