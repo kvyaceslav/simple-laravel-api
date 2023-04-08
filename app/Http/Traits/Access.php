@@ -13,6 +13,6 @@ trait Access
      */
     protected function canAccess(Model $model): bool
     {
-        return $model->user_id !== Auth::id() ? False : True;
+        return !($model->user_id !== Auth::id());
     }
 }
