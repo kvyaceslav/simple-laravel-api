@@ -70,11 +70,9 @@ class ProductController extends Controller
             if (isset($request->categories)) {
                 $categories = Category::ForUserByIds($request->categories);
 
+                $product->categories()->detach();
                 if (!$categories->isEmpty()) {
-                    $product->categories()->detach();
                     $product->categories()->attach($categories);
-                } else {
-                    $product->categories()->detach();
                 }
             }
 
