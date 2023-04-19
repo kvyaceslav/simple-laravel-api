@@ -18,6 +18,8 @@ API Structure:
 CRUD[GET, POST, PUT/PATCH, DELETE] for Categories and Products
 [POST] Login / Register 
 
-Dock route: http://localhost/request-docs/
+API Dock: http://localhost/request-docs/
+Telescope: http://localhost/telescope/
+Horizon: http://localhost/horizon
 
 Best regards.
