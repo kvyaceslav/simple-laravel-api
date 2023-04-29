@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\Auth;
 
 class Category extends Model
 {
@@ -43,7 +42,7 @@ class Category extends Model
      */
     public function scopeForUser(Builder $query): Builder
     {
-        return $query->where('user_id', Auth::id());
+        return $query->where('user_id', auth()->id());
     }
 
     /**
@@ -53,6 +52,6 @@ class Category extends Model
      */
     public function scopeForUserByIds(Builder $query, array $ids): Collection
     {
-        return $query->find($ids)->where('user_id', Auth::id());
+        return $query->find($ids)->where('user_id', auth()->id());
     }
 }

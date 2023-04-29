@@ -3,7 +3,6 @@
 namespace App\Http\Traits;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 
 trait Access
 {
@@ -13,6 +12,6 @@ trait Access
      */
     protected function canAccess(Model $model): bool
     {
-        return !($model->user_id !== Auth::id());
+        return !($model->user_id !== auth()->id());
     }
 }

@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Support\Facades\Auth;
 
 class Product extends Model
 {
@@ -34,6 +33,6 @@ class Product extends Model
      */
     public function scopeForUser(Builder $query): Builder
     {
-        return $query->where('user_id', Auth::id());
+        return $query->where('user_id', auth()->id());
     }
 }

@@ -2,13 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use App\Constants\AuthConstants;
 use App\Http\Controllers\Controller;
 use App\Http\Traits\HttpResponses;
-use Illuminate\Support\Facades\Auth;
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiAuthenticate extends Controller
 {
@@ -22,7 +21,8 @@ class ApiAuthenticate extends Controller
     public function handle(Request $request, Closure $next): Response
     {
         if ($user = auth('sanctum')->user()) {
-            Auth::login($user);
+            auth()->login($user);
+            
             return $next($request);
         }
 

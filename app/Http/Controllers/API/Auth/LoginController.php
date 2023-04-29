@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AuthRequest;
 use App\Http\Traits\HttpResponses;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -19,8 +18,8 @@ class LoginController extends Controller
      */
     public function login(AuthRequest $request): JsonResponse
     {
-        if (Auth::attempt($request->all())) {
-            $user = Auth::user();
+        if (auth()->attempt($request->all())) {
+            $user = auth()->user();
 
             $user->tokens()->delete();
 
@@ -37,7 +36,7 @@ class LoginController extends Controller
      */
     public function logout(): JsonResponse
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
         $user->tokens()->delete();
 
@@ -49,7 +48,7 @@ class LoginController extends Controller
      */
     public function details(): JsonResponse
     {
-        $user = Auth::user();
+        $user = auth()->user();
 
         return $this->success($user, '');
     }
