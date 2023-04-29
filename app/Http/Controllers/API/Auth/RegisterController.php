@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\API\Auth;
 
-use App\Http\Requests\RegisterRequest;
 use App\Constants\AuthConstants;
 use App\Events\UserRegistered;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
 use App\Http\Traits\HttpResponses;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;

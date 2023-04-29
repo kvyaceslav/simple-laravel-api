@@ -4,5 +4,5 @@ namespace App\Constants;
 
 class ValidationConstants
 {
-    const ERROR = 'Validation errors.';
+    public const ERROR = 'Validation errors.';
 }

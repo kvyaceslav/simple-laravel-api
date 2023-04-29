@@ -4,7 +4,7 @@ namespace App\Constants;
 
 class CategoryConstants
 {
-    const DESTROY = 'Category removed successfully.';
-    const STORE = 'Category created successfully.';
-    const UPDATE = 'Category updated successfully.';
+    public const DESTROY = 'Category removed successfully.';
+    public const STORE = 'Category created successfully.';
+    public const UPDATE = 'Category updated successfully.';
 }

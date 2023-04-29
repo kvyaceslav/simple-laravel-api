@@ -2,14 +2,14 @@
 
 namespace App\Http\Traits;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 trait Access
 {
     /**
      * @param Model $model
-     * @return boolean
+     * @return bool
      */
     protected function canAccess(Model $model): bool
     {

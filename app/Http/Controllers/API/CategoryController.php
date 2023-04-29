@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Models\Category;
-use Illuminate\Http\JsonResponse;
 use App\Constants\AuthConstants;
 use App\Constants\CategoryConstants;
 use App\Http\Controllers\Controller;
@@ -11,10 +9,13 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Traits\Access;
 use App\Http\Traits\HttpResponses;
+use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
-    use HttpResponses, Access;
+    use Access;
+    use HttpResponses;
 
     /**
      * @return JsonResponse

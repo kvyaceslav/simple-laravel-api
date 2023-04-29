@@ -4,10 +4,10 @@ namespace App\Constants;
 
 class AuthConstants
 {
-    const VALIDATION = 'Email or Password wrong.';
-    const UNAUTHORIZED = 'Unauthorized.';
-    const REGISTER = 'User register successfully.';
-    const LOGIN = 'User Login successfully.';
-    const LOGOUT = 'User Logout successfully.';
-    const PERMISSION = 'You don`t have permission.';
+    public const VALIDATION = 'Email or Password wrong.';
+    public const UNAUTHORIZED = 'Unauthorized.';
+    public const REGISTER = 'User register successfully.';
+    public const LOGIN = 'User Login successfully.';
+    public const LOGOUT = 'User Logout successfully.';
+    public const PERMISSION = 'You don`t have permission.';
 }

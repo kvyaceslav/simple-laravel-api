@@ -6,16 +6,17 @@ use App\Constants\AuthConstants;
 use App\Constants\ProductConstants;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
-use App\Http\Traits\HttpResponses;
 use App\Http\Resources\ProductResource;
 use App\Http\Traits\Access;
+use App\Http\Traits\HttpResponses;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    use HttpResponses, Access;
+    use Access;
+    use HttpResponses;
 
     /**
      * @return JsonResponse
