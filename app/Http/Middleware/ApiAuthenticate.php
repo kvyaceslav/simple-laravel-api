@@ -22,7 +22,7 @@ class ApiAuthenticate extends Controller
     {
         if ($user = auth('sanctum')->user()) {
             auth()->login($user);
-            
+
             return $next($request);
         }
 

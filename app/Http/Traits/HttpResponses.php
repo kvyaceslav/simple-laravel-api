@@ -8,12 +8,12 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 trait HttpResponses
 {
     /**
-     * @param [type] $data
-     * @param [type] $message
-     * @param [type] $code
+     * @param $data
+     * @param string|null $message
+     * @param int $code
      * @return JsonResponse
      */
-    protected function success($data, $message = null, $code = ResponseAlias::HTTP_OK): JsonResponse
+    protected function success($data, string $message = null, int $code = ResponseAlias::HTTP_OK): JsonResponse
     {
         return response()->json([
             'status' => '',
@@ -23,13 +23,16 @@ trait HttpResponses
     }
 
     /**
-     * @param [type] $data
-     * @param [type] $message
-     * @param [type] $code
+     * @param $data
+     * @param string|null $message
+     * @param int $code
      * @return JsonResponse
      */
-    protected function error($data, $message = null, $code = ResponseAlias::HTTP_BAD_REQUEST): JsonResponse
-    {
+    protected function error(
+        $data,
+        string $message = null,
+        int $code = ResponseAlias::HTTP_BAD_REQUEST
+    ): JsonResponse {
         return response()->json([
             'status' => '',
             'message' => $message,

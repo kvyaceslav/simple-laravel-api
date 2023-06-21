@@ -47,9 +47,9 @@ class CategoryController extends Controller
     {
         if (!$this->canAccess($category)) {
             return $this->error([], AuthConstants::PERMISSION);
-        } else {
-            return $this->success(new CategoryResource($category));
         }
+
+        return $this->success(new CategoryResource($category));
     }
 
     /**
@@ -61,14 +61,14 @@ class CategoryController extends Controller
     {
         if (!$this->canAccess($category)) {
             return $this->error([], AuthConstants::PERMISSION);
-        } else {
-            $category->update($request->all());
-
-            return $this->success(
-                new CategoryResource($category),
-                CategoryConstants::UPDATE
-            );
         }
+
+        $category->update($request->all());
+
+        return $this->success(
+            new CategoryResource($category),
+            CategoryConstants::UPDATE
+        );
     }
 
     /**
@@ -79,10 +79,10 @@ class CategoryController extends Controller
     {
         if (!$this->canAccess($category)) {
             return $this->error([], AuthConstants::PERMISSION);
-        } else {
-            $category->delete();
-
-            return $this->success([], CategoryConstants::DESTROY);
         }
+
+        $category->delete();
+
+        return $this->success([], CategoryConstants::DESTROY);
     }
 }

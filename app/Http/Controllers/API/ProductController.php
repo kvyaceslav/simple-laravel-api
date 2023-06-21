@@ -53,9 +53,9 @@ class ProductController extends Controller
     {
         if (!$this->canAccess($product)) {
             return $this->error([], AuthConstants::PERMISSION);
-        } else {
-            return $this->success(new ProductResource($product));
         }
+
+        return $this->success(new ProductResource($product));
     }
 
     /**
@@ -67,20 +67,20 @@ class ProductController extends Controller
     {
         if (!$this->canAccess($product)) {
             return $this->error(AuthConstants::PERMISSION);
-        } else {
-            if (isset($request->categories)) {
-                $categories = Category::ForUserByIds($request->categories);
-
-                $product->categories()->detach();
-                if (!$categories->isEmpty()) {
-                    $product->categories()->attach($categories);
-                }
-            }
-
-            $product->update($request->all());
-
-            return $this->success(new ProductResource($product), ProductConstants::UPDATE);
         }
+
+        if (isset($request->categories)) {
+            $categories = Category::ForUserByIds($request->categories);
+
+            $product->categories()->detach();
+            if (!$categories->isEmpty()) {
+                $product->categories()->attach($categories);
+            }
+        }
+
+        $product->update($request->all());
+
+        return $this->success(new ProductResource($product), ProductConstants::UPDATE);
     }
 
     /**
@@ -91,10 +91,10 @@ class ProductController extends Controller
     {
         if (!$this->canAccess($product)) {
             return $this->error(AuthConstants::PERMISSION);
-        } else {
-            $product->delete();
-
-            return $this->success([], ProductConstants::DESTROY);
         }
+
+        $product->delete();
+
+        return $this->success([], ProductConstants::DESTROY);
     }
 }
